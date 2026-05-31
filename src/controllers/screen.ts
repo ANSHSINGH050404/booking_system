@@ -30,7 +30,7 @@ export const getAllScreens = async (req: AuthReq, res: Response) => {
 };
 
 export const getScreenByID = async (req: AuthReq, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
 
   const screen = await prisma.screen.findFirst({
     where: { id },
@@ -45,7 +45,7 @@ export const getScreenByID = async (req: AuthReq, res: Response) => {
 };
 
 export const getScreensByTheater = async (req: AuthReq, res: Response) => {
-  const { theaterId } = req.params;
+  const { theaterId } = req.params as { theaterId: string };
 
   const screens = await prisma.screen.findMany({
     where: { theaterId },
@@ -61,7 +61,7 @@ export const updateScreen = async (req: AuthReq, res: Response) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
   const { name, theaterId } = req.body;
 
   const existing = await prisma.screen.findFirst({ where: { id } });
@@ -83,7 +83,7 @@ export const deleteScreen = async (req: AuthReq, res: Response) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
 
   const existing = await prisma.screen.findFirst({ where: { id } });
   if (!existing) {

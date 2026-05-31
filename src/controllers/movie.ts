@@ -11,7 +11,6 @@ export const createMovie = async (req: AuthReq, res: Response) => {
 
   const { title, description, language, duration } = req.body;
 
-  console.log(title, description, language, duration);
   if (!title || !description || !language || !duration) {
     return res
       .status(400)
@@ -32,7 +31,7 @@ export const createMovie = async (req: AuthReq, res: Response) => {
 };
 
 export const getMovieByID = async (req: AuthReq, res: Response) => {
-  const { id: movieId } = req.params;
+  const { id: movieId } = req.params as { id: string };
 
   const data = await prisma.movie.findFirst({
     where: { id: movieId },
@@ -50,4 +49,46 @@ export const getAllMovie = async (req: AuthReq, res: Response) => {
   const movies = await prisma.movie.findMany({});
 
   res.json({ movies });
+};
+
+export const updateMovie = async (req: AuthReq, res: Response) => {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const { id } = req.params as { id: string };
+  const { title, description, language, duration } = req.body;
+
+  const existing = await prisma.movie.findFirst({ where: { id } });
+  if (!existing) {
+    return res.status(404).json({ message: "Movie not found" });
+  }
+
+  const movie = await prisma.movie.update({
+    where: { id },
+    data: { title, description, language, duration },
+  });
+
+  return res.json({ movie });
+};
+
+export const deleteMovie = async (req: AuthReq, res: Response) => {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const { id } = req.params as { id: string };
+
+  const existing = await prisma.movie.findFirst({ where: { id } });
+  if (!existing) {
+    return res.status(404).json({ message: "Movie not found" });
+  }
+
+  await prisma.movie.delete({ where: { id } });
+
+  return res.json({ message: "Movie deleted" });
 };

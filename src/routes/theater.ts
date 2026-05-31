@@ -1,12 +1,21 @@
-import {Router} from "express"
-import {Theater} from "../controllers/theater"
+import { Router } from "express";
+import {
+  createTheater,
+  getAllTheaters,
+  getTheaterById,
+  getTheatersByCity,
+  updateTheater,
+  deleteTheater,
+} from "../controllers/theater";
+import { authenticated } from "../middleware/authMiddleware";
 
-const router=Router()
+const router = Router();
 
-
-router.post("/",Theater)
-
- 
-
+router.post("/", authenticated, createTheater);
+router.get("/", getAllTheaters);
+router.get("/city/:city", getTheatersByCity);
+router.get("/:id", getTheaterById);
+router.put("/:id", authenticated, updateTheater);
+router.delete("/:id", authenticated, deleteTheater);
 
 export default router;
