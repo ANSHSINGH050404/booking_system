@@ -1,10 +1,10 @@
-import {Router} from "express"
+import { Router } from "express";
+import { createShow } from "../controllers/show";
+import { authenticated } from "../middleware/authMiddleware";
 
+const router = Router();
 
-const router=Router()
-
-
-router.post("/",createShow)
+router.post("/", authenticated, createShow);
 
 
 
