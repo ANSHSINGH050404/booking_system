@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id String @id @default(uuid())
+
+  name String
+
+  email String @unique
+
+  password String
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now())
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  seatId    String
+  theaterId String
+  screenId  String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  seat    Seat    @relation(fields: [seatId], references: [id])
+  theater Theater @relation(fields: [theaterId], references: [id])
+  screen  Screen  @relation(fields: [screenId], references: [id])
+}
+
+model Movie {
+  id String @id @default(uuid())
+
+  title String
+
+  description String
+
+  language String
+
+  duration Int
+
+  shows Show[]
+}
+
+model Theater {
+  id String @id @default(uuid())
+
+  name String
+
+  city String
+
+  screens Screen[]
+
+  bookings Booking[]
+}
+
+model Screen {
+  id String @id @default(uuid())
+
+  name String
+
+  theaterId String
+
+  theater   Theater @relation(fields: [theaterId], references: [id])
+
+  bookings Booking[]
+
+  seats Seat[]
+
+  shows Show[]
+}
+
+model Seat {
+  id String @id @default(uuid())
+
+  screenId String
+
+  row String
+
+  number Int
+
+  screen       Screen @relation(fields: [screenId], references: [id])
+
+  showSeats ShowSeat[]
+
+  bookings Booking[]
+}
+
+model Show {
+  id String @id @default(uuid())
+
+  movieId String
+
+  screenId String
+
+  startTime DateTime
+
+  movie        Movie @relation(fields: [movieId], references: [id])
+
+  screen       Screen @relation(fields: [screenId], references: [id])
+
+  showSeats ShowSeat[]
+}
+
+enum SeatStatus {
+  AVAILABLE
+  LOCKED
+  BOOKED
+}
+
+model ShowSeat {
+  id String @id @default(uuid())
+
+  showId String
+
+  seatId String
+
+  status SeatStatus
+
+  lockedBy String?
+
+  lockExpiry DateTime?
+
+  show Show @relation(fields: [showId], references: [id])
+
+  seat Seat @relation(fields: [seatId], references: [id])
+
+  @@unique([showId, seatId])
+}
